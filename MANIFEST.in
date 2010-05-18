@@ -1,0 +1,6 @@
+include README.rst
+include MANIFEST.in
+include LICENSE
+include INSTALL
+recursive-include drainers *.py
+prune drainers/*.pyc

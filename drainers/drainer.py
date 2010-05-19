@@ -59,11 +59,11 @@ class Drainer(object):
         '''
         self.check_interval = check_interval
         self.force_kill_timeout = force_kill_timeout
-        self.should_abort_cb = should_abort_cb      # callbacks
+        self.should_abort_cb = should_abort_cb
         self.read_event_cb = read_event_cb
 
         self._lock = threading.RLock()
-        self._cancel_event = threading.Event()      # status bits
+        self._cancel_event = threading.Event()
         self._popen_args = copy.copy(args)
         self._popen_kwargs = copy.copy(pargs)
 

@@ -1,6 +1,5 @@
 import sys
 import threading
-from subprocess import Popen, PIPE
 import drainers
 
 vars = {}

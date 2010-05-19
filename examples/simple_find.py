@@ -1,6 +1,12 @@
 """
-Simple finder. Search for a file called "foobar" for a maximum of 10
-seconds, then abort.  Present results of found files and errors.
+Simple finder. Search for the file given in sys.argv[1] for a maximum of
+10 seconds, then abort.  Present results of found files and errors.
+
+For the best demonstration effect, make the find run long (for example,
+run the script from /).
+
+Example runs:
+python simple_find.py <somefile>
 """
 import sys
 import drainers

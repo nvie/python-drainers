@@ -10,19 +10,18 @@ STDERR = 2
 
 class Drainer(object):
     def __init__(self, args, read_event_cb=None, should_abort_cb=None,
-                 check_interval=2.0, force_kill_timeout=None, **kwargs):
+                 check_interval=2.0, force_kill_timeout=None, **pargs):
         '''Creates a new Drainer.
 
            A process monitor initializes the given command (from `cmd`). To
            start draining the pipes and generating the read events, invoke
            `start()`.
 
-           Popen keyword arguments:
+           Popen arguments:
            args    -- Args that can be fed to `subprocess.Popen` (see [1]).
-           **pargs -- Keyword arguments that can be fed to
-                      `subprocess.Popen` (see [1]). Beware that
-                      `ProcessMonitor` always sets the `stdout` and
-                      `stderr` params to `subprocess.PIPE`.
+           **pargs -- Keyword arguments that can be fed to `subprocess.Popen`
+                      (see [1]). Beware that `ProcessMonitor` always sets the
+                      `stdout` and `stderr` params to `subprocess.PIPE`.
 
            Keyword arguments:
            read_event_cb --
@@ -67,7 +66,7 @@ class Drainer(object):
         self._lock = threading.RLock()
         self._cancel_event = threading.Event()      # status bits
         self._popen_args = copy.copy(args)
-        self._popen_kwargs = copy.copy(kwargs)
+        self._popen_kwargs = copy.copy(pargs)
 
     def _read_stream(self, stream, is_err):
         # Process a line at a time, checking whether the _cancel_event is fired

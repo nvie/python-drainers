@@ -111,6 +111,8 @@ class Drainer(object):
 
            Note that `start()` blocks until the process is finished.
 
+           Returns the exitcode of the process.
+
         '''
         self._popen_kwargs['stdout'] = subprocess.PIPE
         self._popen_kwargs['stderr'] = subprocess.PIPE
@@ -146,8 +148,10 @@ class Drainer(object):
 
         # in case wait() finishes before force_kill_timeout elapsed, we
         # may simply cancel the force_kill timer
-        self.process.wait()
+        exitcode = self.process.wait()
 
         if self.force_kill_timeout is not None:
             kill_timer.cancel()
+
+        return exitcode
 

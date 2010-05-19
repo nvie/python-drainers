@@ -55,7 +55,9 @@ for cmd in test_cmds:
                          should_abort_cb=should_abort,
                          read_event_cb=handle_line,
                          check_interval=1.0)
-    d.start()
+    retcode = d.start()
+    print
+    print 'Exit code: %d' % retcode
 
     print
     print 'Total line count:'

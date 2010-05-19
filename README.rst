@@ -23,11 +23,13 @@ that `subprocess.Popen`'s initializer takes.  For example, the minimal
 		pass
 
 	my_drainer = Drainer(['ls', '-la'], read_event_cb=ignore_event)
+	my_drainer.start()
 
 But, extra arguments are allowed, too::
 
 	my_drainer = Drainer(['echo', '$JAVA_HOME'], shell=True, bufsize=64,
 						 read_event_cb=ignore_event)
+	my_drainer.start()
 
 The only two arguments to `Drainer` that are reserved are
 `stdout` and `stderr`.  `Drainer` requires them to be
@@ -61,6 +63,7 @@ the value for the `read_event_cb` parameter::
 	
 	foo = MyClass()
 	my_drainer = Drainer(['ls'], read_event_cb=foo.my_method)
+	my_drainer.start()
 
 The granularity currently is a single line.  If you want to read predefined
 chunks of data, please fork this repo and implement a `Drainer` subclass

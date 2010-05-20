@@ -18,7 +18,7 @@ else:
 setup(
     name="drainers",
     version=distmeta.__version__,
-    description=distmeta.__doc__,
+    description="Event-based draining of process output",
     author=distmeta.__author__,
     author_email=distmeta.__contact__,
     url=distmeta.__homepage__,

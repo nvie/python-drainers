@@ -2,5 +2,7 @@ include README.rst
 include MANIFEST.in
 include LICENSE
 include INSTALL
+recursive-include examples *.py
 recursive-include drainers *.py
+prune examples/*.pyc
 prune drainers/*.pyc

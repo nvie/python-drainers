@@ -1,0 +1,19 @@
+Installing drainers
+===================
+
+You can install drainers either via the Python Package Index
+(PyPI) or from source.
+
+To install using pip::
+
+    $ pip install drainers
+
+To install using easy_install::
+
+    $ easy_install drainers
+
+If you have downloaded a source tarball you can install it by doing
+the following::
+
+    $ python setup.py build
+    $ sudo python setup.py install

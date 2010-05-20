@@ -1,0 +1,10 @@
+# iJunk
+.DS_Store
+
+# PyJunk
+*.pyc
+
+# Egg junk
+*.egg-info
+/build
+/dist

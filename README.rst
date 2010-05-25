@@ -66,11 +66,8 @@ the value for the `read_event_cb` parameter::
 	my_drainer.start()
 
 The granularity currently is a single line.  If you want to read predefined
-chunks of data, please fork this repo and implement a `Drainer` subclass
-yourself.  If you want a callback that isn't invoked after each line read, but
-after an arbitrary time or amount of lines, you have to implement this
-yourself.  (It shouldn't be too hard, though.  See the `examples` directory
-for inspiration.)
+chunks (lines) of data, use `BufferedDrainer` instead.  See
+examples/buffer_results.py for an example.
 
 Aborting processes
 ------------------

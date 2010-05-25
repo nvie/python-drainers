@@ -8,6 +8,7 @@ STDOUT = 1
 STDERR = 2
 
 class Drainer(object):
+
     def __init__(self, args, read_event_cb=None, should_abort_cb=None,
                  check_interval=2.0, force_kill_timeout=None, **pargs):
         '''Creates a new Drainer.

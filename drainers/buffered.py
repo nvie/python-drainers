@@ -88,3 +88,14 @@ class BufferedDrainer(_BaseDrainer):
             bufcopy = self._empty_buffer()
             self._orig_read_event_cb(bufcopy)
 
+    def start(self):
+        # 1. Start the timer upfront
+        # 2. Invoke super(BufferedDrainer, self).start()
+        # 3. Stop/kill timer
+        # 4. Flush remaining buffer
+        # 4. Return return value from step 2
+
+        result = super(BufferedDrainer, self).start()
+        self._flush()
+        return result
+

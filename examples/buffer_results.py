@@ -20,25 +20,16 @@ def destroy_cruncher():
 
 files = []
 
-def crunch(files):
+def crunch(lines):
     print 'Setting up cruncher...'
     setup_cruncher()
-    while len(files) > 0:
-        f = files.pop(0)
-        print '- Crunching file %s...' % f.strip()
-        do_something_expensive(f)
+    for line, is_err in lines:
+        if is_err: # ignore errors
+            continue
+        print '- Crunching file %s...' % line.strip()
+        do_something_expensive(line)
     print 'Releasing cruncher...'
     destroy_cruncher()
 
-def add_to_buffer(line, is_err):
-    if is_err:
-        # ignore all errors
-        return
-    files.append(line)
-
-    # start crunch synchronously after 20 items have been read
-    if len(files) >= 20:
-        crunch(files)
-
-d = drainers.Drainer(['find', '.', '-type', 'f'], read_event_cb=add_to_buffer)
+d = drainers.BufferedDrainer(['find', '.', '-type', 'f'], read_event_cb=crunch, chunk_size=20)
 d.start()

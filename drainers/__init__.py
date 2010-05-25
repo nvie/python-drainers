@@ -10,7 +10,7 @@ __contact__ = "vincent@datafox.nl"
 __homepage__ = "http://github.com/nvie/python-drainers/"
 #__docformat__ = "restructuredtext"
 
-from drainer import Drainer
-from drainer import STDIN, STDOUT, STDERR
+from base import Drainer
+from buffered import BufferedDrainer
 
-__all__ = [ 'Drainer', 'STDIN', 'STDOUT', 'STDERR' ]
+__all__ = [ 'Drainer', 'BufferedDrainer' ]

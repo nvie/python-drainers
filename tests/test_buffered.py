@@ -100,3 +100,17 @@ class TestBufferedDrainer(unittest.TestCase):
         self.assertEquals(len(self.chunks), 3)
         self.assertChunksCountUpTo30()
 
+    def testWhenCombinedLikeThisTheChunkSizeNeverFires(self):
+        b = BufferedDrainer(['sh', 'fixtures/counter.sh'],
+                            read_event_cb=self.collect,
+                            chunk_size=40,
+                            flush_timeout=2.5)
+        b.start()
+
+        self.assertEquals(self.callback_invoked, 2)
+        self.assertEquals(self.triggered_by_timer, 1)
+        self.assertEquals(self.triggered_by_chunk_size_exceeded, 0)
+        self.assertEquals(self.triggered_otherwise, 1)
+        self.assertEquals(len(self.chunks), 2)
+        self.assertChunksCountUpTo30()
+

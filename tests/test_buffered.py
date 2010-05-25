@@ -20,7 +20,7 @@ class TestBufferedDrainer(unittest.TestCase):
         self.chunks.append(lines)
 
         called_functions = [fname for _, _, fname, _ in traceback.extract_stack()]
-        if '_flush_and_reset' in called_functions:
+        if '_awake_from_timer' in called_functions:
             self.triggered_by_timer += 1
         elif '_wrapper' in called_functions:
             self.triggered_by_chunk_size_exceeded += 1
@@ -98,5 +98,19 @@ class TestBufferedDrainer(unittest.TestCase):
         self.assertEquals(self.triggered_by_chunk_size_exceeded, 3)
         self.assertEquals(self.triggered_otherwise, 0)
         self.assertEquals(len(self.chunks), 3)
+        self.assertChunksCountUpTo30()
+
+    def testWhenCombinedLikeThisTheChunkSizeNeverFires(self):
+        b = BufferedDrainer(['sh', 'fixtures/counter.sh'],
+                            read_event_cb=self.collect,
+                            chunk_size=40,
+                            flush_timeout=2.5)
+        b.start()
+
+        self.assertEquals(self.callback_invoked, 2)
+        self.assertEquals(self.triggered_by_timer, 1)
+        self.assertEquals(self.triggered_by_chunk_size_exceeded, 0)
+        self.assertEquals(self.triggered_otherwise, 1)
+        self.assertEquals(len(self.chunks), 2)
         self.assertChunksCountUpTo30()
 

@@ -1,3 +1,4 @@
+import threading
 from base import _BaseDrainer
 
 class BufferedDrainer(_BaseDrainer):
@@ -5,7 +6,7 @@ class BufferedDrainer(_BaseDrainer):
     def __init__(self, args, read_event_cb=None, should_abort_cb=None,
                  check_interval=2.0, force_kill_timeout=None,
                  chunk_size=0,
-                 #flush_timeout=None,
+                 flush_timeout=None,
                  **pargs):
         '''Creates a new BufferedDrainer.
 
@@ -36,13 +37,13 @@ class BufferedDrainer(_BaseDrainer):
                          amount of calls to `read_event_cb`.
                          (Default: disabled, 0)
 
-           #flush_timeout --
-           #              A timeout value (in seconds, floating point) to
-           #              time-limit buffering.  When `flush_timeout`
-           #              elapses, the buffer is flushed by calling
-           #              `read_event_cb` with all the lines that are
-           #              read so far.
-           #              (Default: None)
+           flush_timeout --
+                         A timeout value (in seconds, floating point) to
+                         time-limit buffering.  When `flush_timeout`
+                         elapses, the buffer is flushed by calling
+                         `read_event_cb` with all the lines that are
+                         read so far.
+                         (Default: None)
 
            If both `chunk_size` and `flush_timeout` are specified, the
            buffer is flushed when either of both conditions is matched.
@@ -58,16 +59,25 @@ class BufferedDrainer(_BaseDrainer):
             **pargs)
         self._orig_read_event_cb = read_event_cb
         self.chunk_size = chunk_size
-        #self.flush_timeout = flush_timeout
+        self.flush_timeout = flush_timeout
         self._buffer = []
+        self._timer = None
 
     @property
     def buffer(self):
         return self._buffer
 
     def _should_flush(self):
-        return self.chunk_size <= 0 or \
-            len(self.buffer) >= self.chunk_size
+        # If neither chunk_size or flush_timeout is set, behave
+        # like a regular Drainer
+        if self.chunk_size == 0 and self.flush_timeout is None:
+            return True
+
+        if self.chunk_size <= 0:
+            # Use timer-based flushing instead
+            return False
+        else:
+            return len(self.buffer) >= self.chunk_size
 
     def _wrapper(self, line, is_err):
         tuple = (line, is_err)
@@ -88,6 +98,25 @@ class BufferedDrainer(_BaseDrainer):
             bufcopy = self._empty_buffer()
             self._orig_read_event_cb(bufcopy)
 
+    def _create_timer(self):
+        if not self.flush_timeout is None:
+            self._timer = threading.Timer(self.flush_timeout, self._flush_and_reset)
+            self._timer.daemon = True
+            self._timer.start()
+
+    def _destroy_timer(self):
+        if not self._timer is None:
+            self._timer.cancel()
+
+    def _reset_timer(self):
+        if not self._timer is None:
+            self._destroy_timer()
+            self._create_timer()
+
+    def _flush_and_reset(self):
+        self._flush()
+        self._create_timer()
+
     def start(self):
         # 1. Start the timer upfront
         # 2. Invoke super(BufferedDrainer, self).start()
@@ -95,7 +124,9 @@ class BufferedDrainer(_BaseDrainer):
         # 4. Flush remaining buffer
         # 4. Return return value from step 2
 
+        self._create_timer()
         result = super(BufferedDrainer, self).start()
+        self._destroy_timer()
         self._flush()
         return result
 

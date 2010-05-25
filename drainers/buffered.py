@@ -67,6 +67,10 @@ class BufferedDrainer(_BaseDrainer):
     def buffer(self):
         return self._buffer
 
+    @property
+    def timer(self):
+        return self._timer
+
     def _should_flush(self):
         # If neither chunk_size or flush_timeout is set, behave
         # like a regular Drainer
@@ -84,7 +88,7 @@ class BufferedDrainer(_BaseDrainer):
         self.buffer.append(tuple)
 
         if self._should_flush():
-            self._flush()
+            self._flush(restart_timer=True)
 
     def _empty_buffer(self):
         '''Empty the buffer and return a copy of it.'''
@@ -93,28 +97,32 @@ class BufferedDrainer(_BaseDrainer):
             bufcopy.append(self.buffer.pop(0))
         return bufcopy
 
-    def _flush(self):
+    def _flush(self, restart_timer=True):
+        if self.timer and restart_timer:
+            self._destroy_timer()
+
         if len(self.buffer) > 0:
             bufcopy = self._empty_buffer()
             self._orig_read_event_cb(bufcopy)
 
+        if self.timer and restart_timer:
+            self._create_timer()
+
     def _create_timer(self):
         if not self.flush_timeout is None:
-            self._timer = threading.Timer(self.flush_timeout, self._flush_and_reset)
+            self._timer = threading.Timer(self.flush_timeout, self._awake_from_timer)
             self._timer.daemon = True
             self._timer.start()
 
     def _destroy_timer(self):
-        if not self._timer is None:
-            self._timer.cancel()
+        if self.timer:
+            self.timer.cancel()
 
-    def _reset_timer(self):
-        if not self._timer is None:
-            self._destroy_timer()
-            self._create_timer()
-
-    def _flush_and_reset(self):
-        self._flush()
+    def _awake_from_timer(self):
+        # Don't let flush restart the timer.  This function is only
+        # called by a Timer that has gone off, so cancelling it has no
+        # effect from here.  Instead, we create a new Timer when done.
+        self._flush(restart_timer=False)
         self._create_timer()
 
     def start(self):
@@ -127,6 +135,6 @@ class BufferedDrainer(_BaseDrainer):
         self._create_timer()
         result = super(BufferedDrainer, self).start()
         self._destroy_timer()
-        self._flush()
+        self._flush(restart_timer=False)
         return result
 

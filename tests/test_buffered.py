@@ -20,7 +20,7 @@ class TestBufferedDrainer(unittest.TestCase):
         self.chunks.append(lines)
 
         called_functions = [fname for _, _, fname, _ in traceback.extract_stack()]
-        if '_flush_and_reset' in called_functions:
+        if '_awake_from_timer' in called_functions:
             self.triggered_by_timer += 1
         elif '_wrapper' in called_functions:
             self.triggered_by_chunk_size_exceeded += 1

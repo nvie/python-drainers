@@ -2,6 +2,8 @@
  drainers - Event-based draining of process output
 ===================================================
 
+.. image:: http://stillmaintained.com/nvie/python-drainers.png
+
 drainers is an abstraction around `subprocess.Popen` to read and control
 process output event-wise.  It also allows you to abort running processes
 either gracefully or forcefully without having to directly interact with the
